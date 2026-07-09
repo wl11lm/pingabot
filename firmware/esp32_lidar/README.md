@@ -22,7 +22,7 @@ No arquivo do exemplo, os únicos pontos que alteramos em relação ao padrão s
 
 ```cpp
 const uint8_t LIDAR_GPIO_EN  = 19; 
-#const uint8_t LIDAR_GPIO_RX  = 16;
+// const uint8_t LIDAR_GPIO_RX  = 16;
 const uint8_t LIDAR_GPIO_TX  = 17;
 const uint8_t LIDAR_GPIO_PWM = 15;
 
