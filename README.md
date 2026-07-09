@@ -17,6 +17,8 @@ LiDAR LDS02RR ──> ESP32 ──UART──> Raspberry Pi 4
 
 Mais detalhes da arquitetura de nós/tópicos ROS2 em [`docs/architecture.md`](docs/architecture.md). *(a ser implementado)*
 
+📹 **Vídeo de demonstração:** [https://youtu.be/_JYmyTu3Q5M](https://youtu.be/_JYmyTu3Q5M)
+
 ## Estrutura do repositório
 
 ```
@@ -100,6 +102,13 @@ Mais comandos de debug (tópicos, nós, frequência) em [`docs/troubleshooting.m
 - [`docs/architecture.md`](docs/architecture.md) — grafo de nós, tópicos e máquina de estados da missão.
 - [`docs/calibration.md`](docs/calibration.md) — tempos de trajeto, limiares do KY-003, velocidades seguras.
 - [`docs/troubleshooting.md`](docs/troubleshooting.md) — problemas já resolvidos (reset por queda de tensão, ground bounce da bomba, etc.) e comandos de debug do ROS2.
+
+## Integrantes
+ 
+- Arthur Roberto da Silva
+- Maria Eduarda Santana Marques
+- Pedro Nobrega Damacena
+- William Marreiro Brito
 
 ## Licença
 
