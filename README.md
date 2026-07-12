@@ -1,10 +1,10 @@
 # PingaBot
 
-Carrinho garçom autônomo de doses, baseado em **ROS 2 (Humble)** e **Micro-ROS**. O robô identifica quando alguém levanta a mão via webcam, percorre um trajeto pré-calibrado seguindo as paredes de uma mesa com auxílio de um LiDAR, e serve uma dose automaticamente ao detectar um copo em cada parada.
+Carrinho garçom autônomo de doses, baseado em **ROS 2 (Humble)** e **Micro-ROS**. O robô identifica o gesto de "número 1" via webcam, percorre um trajeto pré-calibrado seguindo as paredes de uma mesa com auxílio de um LiDAR, e serve uma dose automaticamente ao detectar um copo em cada parada.
 
 ## Como funciona (visão geral)
 
-1. Uma **webcam** na Raspberry Pi 4 roda um pipeline de visão computacional que detecta o gesto de mão levantada.
+1. Uma **webcam** na Raspberry Pi 4 roda um pipeline de visão computacional (MediaPipe) que reconhece especificamente o gesto de **"número 1"** (indicador levantado, demais dedos abaixados).
 2. Ao detectar, a Raspberry Pi dispara a **rota da missão**: o robô se move em paradas pré-definidas, usando leituras de um **LiDAR LDS02RR** (via ESP32) para se guiar pelas paredes da mesa.
 3. Em cada parada, o robô espera a colocação de um copo. Um sensor de efeito Hall (**KY-003**) na base detecta o ímã do copo e a **Raspberry Pi Pico** aciona a bomba de dosagem **de forma autônoma** - sem depender do ROS para essa parte crítica de tempo. Retornando à rota apenas quando o copo tenha sido removido (caso colocado).
 4. Concluídas as paradas, o robô retorna à posição inicial e volta a monitorar a webcam.
@@ -15,7 +15,7 @@ Webcam ──USB──> Raspberry Pi 4 ──UART──> Raspberry Pi Pico (moto
 LiDAR LDS02RR ──> ESP32 ──UART──> Raspberry Pi 4
 ```
 
-Mais detalhes da arquitetura de nós/tópicos ROS2 em [`docs/architecture.md`](docs/architecture.md). *(a ser implementado)*
+Mais detalhes da arquitetura de nós/tópicos ROS2 em [`docs/architecture.md`](docs/architecture.md).
 
 📹 **Vídeo de demonstração:** [https://youtu.be/_JYmyTu3Q5M](https://youtu.be/_JYmyTu3Q5M)
 
@@ -24,7 +24,7 @@ Mais detalhes da arquitetura de nós/tópicos ROS2 em [`docs/architecture.md`](d
 ```
 pingabot/
 ├── firmware/
-│   ├── pico/            # firmware da Raspberry Pi Pico (Micro-ROS): motores, bomba, buzzer, KY-003
+│   ├── pico/src/         # firmware da Raspberry Pi Pico (Micro-ROS): motores, bomba, buzzer, KY-003
 │   └── esp32_lidar/      # firmware da ESP32 (leitura do LiDAR LDS02RR, biblioteca kaiaai/LDS)
 │
 ├── ros2_ws/
@@ -55,7 +55,7 @@ Resumo:
 
 - Ubuntu com **ROS 2 Humble** instalado na Raspberry Pi.
 - [Micro-ROS Agent](https://micro.ros.org/) para a comunicação com a Pico.
-- Pico SDK configurado para compilar o firmware em `firmware/pico/`.
+- Pico SDK configurado para compilar o firmware em `firmware/pico/src/` (ver [`firmware/pico/README.md`](firmware/pico/README.md) — alguns arquivos de terceiros precisam ser copiados antes de compilar).
 - Arduino IDE (ou PlatformIO) + biblioteca [`kaiaai/LDS`](https://github.com/kaiaai/LDS) para a ESP32 - ver [`firmware/esp32_lidar/README.md`](firmware/esp32_lidar/README.md).
 - Python 3 com `rclpy`, `opencv-python` e a lib de detecção de mãos usada em `pingabot_vision`.
 
@@ -70,7 +70,7 @@ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
 # 2. Leitura do LiDAR (ESP32 -> /scan)
 python3 ros2_ws/src/pingabot_navigation/lidar_serial_node.py
 
-# 3. Detecção de mão levantada (webcam -> /pedido_dose)
+# 3. Detecção do gesto "número 1" (webcam -> /pedido_dose)
 python3 ros2_ws/src/pingabot_vision/hand_detector_node.py
 
 # 4. Orquestrador da missão
@@ -80,7 +80,7 @@ python3 ros2_ws/src/pingabot_mission/mission_node.py
 Para testar sem câmera/lidar, dá pra simular os eventos manualmente:
 
 ```bash
-# simula "mão levantada"
+# simula o gesto "número 1"
 ros2 topic pub --once /pedido_dose std_msgs/msg/Empty "{}"
 
 # simula "copo detectado / dose concluída"
